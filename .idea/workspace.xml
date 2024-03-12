@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="11b648f6-9eba-43f6-b402-f9f37dad5c88" name="Changes" comment="Tester å legge ut" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "FilipThue"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="7f813ac8-8f13-4b4c-a6e0-bcd363b7bcde" />
+        <option name="url" value="https://github.com/FilipThue/DidrikAdventure2.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2cuG7FdhS5tJcGkgA0oiF3tnco9" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.DidrikAdventure.executor": "Run",
+    "Python.Didrik_adventure.executor": "Run",
+    "Python.Didrik_adventure_sprite.executor": "Run",
+    "Python.didrik_adventure.executor": "Run",
+    "Python.didrik_adventure_save.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.settings.executor": "Run",
+    "Python.sprites.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/filipthue/Library/CloudStorage/OneDrive-Vikenfylkeskommune/fag/VG3/Programmering/pycharm/Didrik_Adventure",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
+  },
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "directory"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/gamle filer" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-50da183f06c8-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13135.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="11b648f6-9eba-43f6-b402-f9f37dad5c88" name="Changes" comment="" />
+      <created>1708953880930</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1708953880930</updated>
+    </task>
+    <task id="LOCAL−00001" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1708954004290</created>
+      <option name="number" value="LOCAL−00001" />
+      <option name="presentableId" value="LOCAL−00001" />
+      <updated>1708954004290</updated>
+    </task>
+    <task id="LOCAL−00002" summary="Tester å legge u">
+      <option name="closed" value="true" />
+      <created>1708954332516</created>
+      <option name="number" value="LOCAL−00002" />
+      <option name="presentableId" value="LOCAL−00002" />
+      <updated>1708954332516</updated>
+    </task>
+    <task id="LOCAL−00003" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1708954507850</created>
+      <option name="number" value="LOCAL−00003" />
+      <option name="presentableId" value="LOCAL−00003" />
+      <updated>1708954507850</updated>
+    </task>
+    <task id="LOCAL−00004" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1708955691115</created>
+      <option name="number" value="LOCAL−00004" />
+      <option name="presentableId" value="LOCAL−00004" />
+      <updated>1708955691115</updated>
+    </task>
+    <task id="LOCAL−00005" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1708955726528</created>
+      <option name="number" value="LOCAL−00005" />
+      <option name="presentableId" value="LOCAL−00005" />
+      <updated>1708955726528</updated>
+    </task>
+    <task id="LOCAL−00006" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1708957231325</created>
+      <option name="number" value="LOCAL−00006" />
+      <option name="presentableId" value="LOCAL−00006" />
+      <updated>1708957231325</updated>
+    </task>
+    <task id="LOCAL−00007" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1708957704553</created>
+      <option name="number" value="LOCAL−00007" />
+      <option name="presentableId" value="LOCAL−00007" />
+      <updated>1708957704553</updated>
+    </task>
+    <task id="LOCAL−00008" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1709033120275</created>
+      <option name="number" value="LOCAL−00008" />
+      <option name="presentableId" value="LOCAL−00008" />
+      <updated>1709033120275</updated>
+    </task>
+    <task id="LOCAL−00009" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1709034782193</created>
+      <option name="number" value="LOCAL−00009" />
+      <option name="presentableId" value="LOCAL−00009" />
+      <updated>1709034782193</updated>
+    </task>
+    <task id="LOCAL−00010" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1709046058074</created>
+      <option name="number" value="LOCAL−00010" />
+      <option name="presentableId" value="LOCAL−00010" />
+      <updated>1709046058074</updated>
+    </task>
+    <task id="LOCAL−00011" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1709991974346</created>
+      <option name="number" value="LOCAL−00011" />
+      <option name="presentableId" value="LOCAL−00011" />
+      <updated>1709991974346</updated>
+    </task>
+    <task id="LOCAL−00012" summary="Tester å legge ut">
+      <option name="closed" value="true" />
+      <created>1709991983309</created>
+      <option name="number" value="LOCAL−00012" />
+      <option name="presentableId" value="LOCAL−00012" />
+      <updated>1709991983309</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Tester å legge u" />
+    <MESSAGE value="Tester å legge ut" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tester å legge ut" />
+  </component>
+</project>
