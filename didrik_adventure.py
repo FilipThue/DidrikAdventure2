@@ -30,19 +30,19 @@ class World:
                     img_rect = img.get_rect()
                     img_rect.x = col_count * TILE_SIZE
                     img_rect.y = row_count * TILE_SIZE
-                    self.tile_list.append((img, img_rect))
+                    self.tile_list.append((img, img_rect, "ground"))
                 if tile == 2:
                     img = pygame.transform.scale(ground_img, (TILE_SIZE, TILE_SIZE))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * TILE_SIZE
                     img_rect.y = row_count * TILE_SIZE
-                    self.tile_list.append((img, img_rect))
+                    self.tile_list.append((img, img_rect, "ground"))
                 if tile == 3:
                     img = pygame.transform.scale(spike_img, (TILE_SIZE, TILE_SIZE))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * TILE_SIZE
                     img_rect.y = row_count * TILE_SIZE
-                    self.tile_list.append((img, img_rect))
+                    self.tile_list.append((img, img_rect, "trap"))
 
                 col_count += 1
             row_count += 1
@@ -115,8 +115,14 @@ class Level1(Level_scene):
         if self.player.rect.y > HEIGHT:
             return Level2()
 
+class Start_screen(Scene):
+    print('hello')
 
-game = Game(Level1())
+    def update(self):
+        return Level1()
+
+
+game = Game(Start_screen())
 game.run()
 
 pygame.quit()
