@@ -37,12 +37,9 @@ def load_sprite_sheets(directory, width, height):
 
 
 class Player:
-    def __init__(self, x, y, checkpoint):
+    def __init__(self, x, y):
         img = py.image.load('assets/sprites/Didrik/didrik_chilling.png')
         self.sprites = load_sprite_sheets("Didrik", 5, 8)
-        life_img = py.image.load('assets/img/didriklife.png')
-        #self.img = py.transform.scale(img, (5 * PLAYER_SCALE, 8 * PLAYER_SCALE))
-        self.life_img = py.transform.scale(life_img, (7 * LIFE_SCALE, 10 * LIFE_SCALE))
         self.rect = self.sprites["didrik_walking_right"][0].get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -50,15 +47,14 @@ class Player:
         self.height = self.sprites["didrik_walking_right"][0].get_height()
         self.vel_y = 0
 
-        self.current_animation = "didrik_jumping"
+        self.current_animation = "didrik_walking"
         self.direction = "right"
         self.animation_count = 5
 
         self.jumped = False
         self.moving_x = False
-        self.checkpoint_mode = checkpoint
 
-        print(self.sprites)
+        # print(self.sprites)
 
 
     def update(self, world):
@@ -70,11 +66,13 @@ class Player:
             self.vel_y = - JUMP_SPEED
             self.jumped = True
 
-            self.current_animation = "didrik_jumping"
+
 
         if (key[py.K_UP] or key[py.K_SPACE]) == False and self.vel_y != 0:
             self.jumped = True
 
+        if self.jumped:
+            self.current_animation = "didrik_jumping"
 
 
         if key[py.K_LEFT] or key[py.K_a]:
@@ -104,8 +102,15 @@ class Player:
             # x
             if tile[1].colliderect(self.rect.x  + delta[0], self.rect.y, self.width, self.height):  # tile[0] er bildet
                 if tile[2] == "trap":
-                    print("død x")
-                    self.rect.y = START_POS_2[1]
+                    if world.lives > 0:
+                        print(world.lives)
+                        self.rect.x = START_POS[0]
+                        self.rect.y = START_POS[1]
+
+                    else:
+                        world.lives -= 1
+
+
                 else:
                     delta[0] = 0
                     self.moving_x = False
@@ -114,7 +119,14 @@ class Player:
             # y
             if tile[1].colliderect(self.rect.x, self.rect.y + delta[1], self.width, self.height):
                 if tile[2] == "trap":
-                    self.rect.y = START_POS_2[1]
+                    if world.lives > 0:
+                        print(world.lives)
+                        self.rect.x = START_POS[0]
+                        self.rect.y = START_POS[1]
+
+                    else:
+                        world.lives -= 1
+
                 else:
                     if self.vel_y >= 0:  # sjekker om han står på bakken
                         delta[1] = tile[1].top - self.rect.bottom
@@ -130,11 +142,7 @@ class Player:
 
 
     def draw(self):
-        # pg.draw.rect(SCREEN, (255, 0, 0), self.rect)
+        # pg.draw.rect(SCREEN, RED, self.rect)
 
         SCREEN.blit(self.sprites[f"{self.current_animation}_{self.direction}"][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[f"{self.current_animation}_{self.direction}"])], self.rect)
-        if self.checkpoint_mode == True:
-            SCREEN.blit(self.life_img, (60, 60))
-
-
 
