@@ -9,13 +9,21 @@ SCREEN = pg.display.set_mode((WIDTH, HEIGHT))
 
 START_COLOR = (0, 70, 30)
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+
+BUTTON_WIDTH = 500
+BUTTON_HEIGHT = 300
+BUTTON_SPACING = 60
+BUTTON_y = (HEIGHT - BUTTON_HEIGHT) // 2
 
 
 TILE_SIZE = 50
 
 PLAYER_SCALE = 7
 ANIMATION_DELAY = 5
+
 LIFE_SCALE = 4
+LIFE_POSITION = (60, 55)
 
 JUMP_SPEED = 32
 WALKING_SPEED = 5
@@ -147,4 +155,6 @@ world_data_5 =[
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
+
+
 
