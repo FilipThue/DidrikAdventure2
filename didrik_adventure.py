@@ -23,12 +23,6 @@ class World:
         self.tile_list = []
         self.lives = lives
 
-        wall_img = pygame.image.load('assets/img/gulv.png')
-        ground_img = pygame.image.load('assets/img/gulv_skole.png')
-        spike_img = pygame.image.load('assets/img/spikes.png')
-        checkpoint_life_img = pygame.image.load('assets/img/didriklife_checkpoint.png')
-        one_life_img = pygame.image.load('assets/img/didriklife_one.png')
-
         self.checkpoint_life_img = py.transform.scale(checkpoint_life_img, (16 * LIFE_SCALE, 10 * LIFE_SCALE))
         self.one_life_img = py.transform.scale(one_life_img, (16 * LIFE_SCALE, 10 * LIFE_SCALE))
 
@@ -68,7 +62,6 @@ class World:
             # pygame.draw.rect(SCREEN, (255, 255, 255), tile[1], 1)
         if self.lives > 0:
             SCREEN.blit(self.checkpoint_life_img, LIFE_POSITION)
-            print(self.lives)
         if self.lives == 0:
             SCREEN.blit(self.one_life_img, LIFE_POSITION)
 
@@ -93,6 +86,37 @@ class Game:
                     run = False
 
             pygame.display.update()
+
+
+#/------------------------------------------------------
+
+class Prop:
+    def __init__(self, x, y, w, h, img):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.img = pygame.transform.scale(img, (w, h))
+
+    def draw(self):
+        SCREEN.blit(self.img, (self.x, self.y))
+
+
+
+class Spike:
+    def __init__(self, x, y):
+        self.img = pygame.transform.scale(spike_img, (TILE_SIZE, TILE_SIZE))
+        self.x = x
+        self.y = y
+        self.hitbox = [x + SPIKE_LENIENCY / 2, y + SPIKE_LENIENCY, TILE_SIZE - SPIKE_LENIENCY,
+                       TILE_SIZE - SPIKE_LENIENCY]
+
+    def draw(self):
+        SCREEN.blit(self.img, (self.x, self.y))
+        pygame.draw.rect(SCREEN, RED, self.hitbox, 2)
+
+
+#/------------------------------------------------------
 
 
 class Scene:
@@ -152,7 +176,7 @@ class Level4(Level_scene):
 
 class Level3(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_3, START_POS_3, lives)
+        super().__init__(world_data_3, START_POS, lives)
 
     def update(self):
         self.common_update()
@@ -168,7 +192,7 @@ class Level3(Level_scene):
 
 class Level2_5(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_2_5, START_POS_2_5, lives)
+        super().__init__(world_data_2_5, START_POS, lives)
 
     def update(self):
         self.common_update()
@@ -185,25 +209,89 @@ class Level2_5(Level_scene):
 class Level2(Level_scene):
     def __init__(self, lives):
         super().__init__(world_data_2, START_POS_2, lives)
+        self.portals = [Portal(280, 90), Portal(770, 90)]
+        self.level_started = 0
+        self.trap_activation = 5 * TILE_SIZE
+        self.spikes = [Spike(8 * TILE_SIZE, 8 * TILE_SIZE), Spike(19 * TILE_SIZE, 9 * TILE_SIZE), Spike(9 * TILE_SIZE, 4 * TILE_SIZE)]
+        self.trap_timer = 0
+        self.trap_activated = False
+
 
     def update(self):
         self.common_update()
+        for i in range(2):
+            self.portals[i].update_sprite()
+
+
+        # feller
+        if self.player.rect.x > self.trap_activation - self.player.width:
+            self.level_started += 1
+
+        if self.level_started == 1:
+            self.spikes.insert(0, Spike(self.trap_activation, 11 * TILE_SIZE))
+            self.trap_activated = True
+
+        if self.trap_timer > 90:
+            if self.trap_activated:
+                self.trap_activated = False
+                if len(self.spikes) > 3:
+                    self.spikes.pop(3)
+                self.trap_timer = 0
+            else:
+                self.trap_activated = True
+                if len(self.spikes) < 4:
+                    self.spikes.insert(3, Spike(9 * TILE_SIZE, 4 * TILE_SIZE))
+                self.trap_timer = 0
+
+        if self.player.rect.x > 21 * TILE_SIZE:
+            if self.spikes[2].hitbox[0] < self.player.rect.x:
+                self.spikes[2].hitbox[0] += SPIKE_SPEED
+                self.spikes[2].x += SPIKE_SPEED
+
+
+
+        for i in range(len(self.spikes)):
+            if self.player.rect.colliderect(self.spikes[i].hitbox):
+                self.player.rect.x = START_POS[0]
+                self.player.rect.y = START_POS[1]
+
+        # portalen
+        if 280 < self.player.rect.x < 300 and 90 < self.player.rect.y < 200:  # definerer portalinngangen
+            self.player.rect.x = 800
+
 
         if self.player.rect.x > WIDTH:
             return Level3(self.lives)
 
+        self.trap_timer += 1
+
     def draw(self):
         SCREEN.blit(bg_img_level2, (0, 0))
+
+        for i in range(2):
+            self.portals[i].draw()
+
         self.player.draw()
+
+        for i in range(len(self.spikes)):
+            self.spikes[i].draw()
+
         return super().draw()
+
 
 
 class Level1(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_1, START_POS_1, lives)
+        super().__init__(world_data_1, START_POS, lives)
+        self.hidden_tile_x = 17 * TILE_SIZE
+        self.props = []
+        for i in range (3):
+            self.props.append(Prop(self.hidden_tile_x + TILE_SIZE * i, HEIGHT-TILE_SIZE, TILE_SIZE, TILE_SIZE, ground_img))
+
 
     def update(self):
         self.common_update()
+
 
         if self.player.rect.y > HEIGHT:
             return Level2(self.lives)
@@ -212,6 +300,11 @@ class Level1(Level_scene):
 
     def draw(self):
         SCREEN.blit(bg_img, (0, 0))
+
+        if self.player.rect.x < self.hidden_tile_x:
+            for i in range(len(self.props)):
+                self.props[i].draw()
+
         self.player.draw()
         return super().draw()
 
