@@ -8,7 +8,7 @@ def flip(sprites):
     return [pg.transform.flip(sprite, True, False) for sprite in sprites]
 
 #------------------------------------------------
-def load_sprite_sheets(directory, width, height):
+def load_sprite_sheets(directory, width, height, sprite_scale):
     path = join("assets/sprites", directory)
     files = [f for f in listdir(path) if isfile(join(path, f))]
 
@@ -25,7 +25,7 @@ def load_sprite_sheets(directory, width, height):
             surface = pg.Surface((width, height), pg.SRCALPHA, 32)  # pygame.SRCALPHA gjør at man kan loade gjennomsiktig bakgrunn, 32 er farge dybden målt i bits
             rect = pg.Rect(i * width, 0, width, height)
             surface.blit(sprite_sheet, (0, 0), rect) # blitter et utklipp av spritesheeten i posisjon (0,0) på surfacen
-            sprites.append(pg.transform.scale_by(surface, PLAYER_SCALE)) # legger til og skalerer bildet i en liste av sprites
+            sprites.append(pg.transform.scale_by(surface, sprite_scale)) # legger til og skalerer bildet i en liste av sprites
 
             all_sprites[file.replace(".png", "") + "_right"] = sprites
             all_sprites[file.replace(".png", "") + "_left"] = flip(sprites)
@@ -35,11 +35,29 @@ def load_sprite_sheets(directory, width, height):
 
 #------------------------------------------------
 
+class Portal:
+    def __init__(self, x, y):
+        self.sprites = load_sprite_sheets("portal", 70, 100, PORTAL_SCALE)
+        self.rect = self.sprites["portal_right"][0].get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = self.sprites["portal_right"][0].get_width()
+        self.height = self.sprites["portal_right"][0].get_height()
+
+        self.direction = "right"
+        self.animation_count = 5
+
+    def update_sprite(self):
+        self.animation_count += 1
+
+    def draw(self):
+        SCREEN.blit(self.sprites["portal_right"][(self.animation_count // ANIMATION_DELAY) % len(self.sprites["portal_right"])], self.rect)
+
+
 
 class Player:
     def __init__(self, x, y):
-        img = py.image.load('assets/sprites/Didrik/didrik_chilling.png')
-        self.sprites = load_sprite_sheets("Didrik", 5, 8)
+        self.sprites = load_sprite_sheets("Didrik", 5, 8, PLAYER_SCALE)
         self.rect = self.sprites["didrik_walking_right"][0].get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -136,6 +154,10 @@ class Player:
                         delta[1] = tile[1].bottom - self.rect.top
                         self.vel_y = 0
 
+                if self.rect.x < 0:
+                    self.rect.x = 0
+                    self.current_animation = "didrik_chilling"
+
         self.rect.x += delta[0]
         self.rect.y += delta[1]
 
@@ -145,4 +167,3 @@ class Player:
         # pg.draw.rect(SCREEN, RED, self.rect)
 
         SCREEN.blit(self.sprites[f"{self.current_animation}_{self.direction}"][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[f"{self.current_animation}_{self.direction}"])], self.rect)
-
