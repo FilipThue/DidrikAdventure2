@@ -167,3 +167,4 @@ spike_img = pg.image.load('assets/img/spikes.png')
 checkpoint_life_img = pg.image.load('assets/img/didriklife_checkpoint.png')
 one_life_img = pg.image.load('assets/img/didriklife_one.png')
 
+
