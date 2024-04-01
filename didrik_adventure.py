@@ -202,7 +202,7 @@ class Level3(Level_scene):
             if self.lives == 1:
                 return Level3(self.lives)
             else:
-                return Start_screen()
+                return Loose_screen()
 
         if self.player.rect.x > WIDTH:
             return Level4(self.lives)
@@ -281,7 +281,7 @@ class Level2(Level_scene):
                 if self.lives == 1:
                     return Level2(self.lives)
                 else:
-                    return Start_screen()
+                    return Loose_screen()
 
         # portalen
         if 280 < self.player.rect.x < 300 and 90 < self.player.rect.y < 200:  # definerer portalinngangen
@@ -325,7 +325,7 @@ class Level1(Level_scene):
             if self.lives == 1:
                 return Level1(self.lives)
             else:
-                return Start_screen()
+                return Loose_screen()
 
 
         if self.player.rect.y > HEIGHT:
@@ -402,10 +402,20 @@ class Start_screen(Scene):
                     # Start hovedspillet med 5 liv
                     return Level1(1)
 
+class Loose_screen(Scene):
+    def __init__(self):
+        self.bg_img = pygame.image.load("assets/backdrops/you_loose.png")
+
+    def update(self):
+        print("her skal ett eller annent gjøre dette: return Start_screen")
+
+    def draw(self):
+        SCREEN.blit(self.bg_img, (0, 0))
+        draw_text("Du tapte", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
+
+
 
 game = Game(Start_screen())
 game.run()
 
 pygame.quit()
-
-
