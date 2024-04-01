@@ -54,6 +54,35 @@ class Portal:
         SCREEN.blit(self.sprites["portal_right"][(self.animation_count // ANIMATION_DELAY) % len(self.sprites["portal_right"])], self.rect)
 
 
+class Car:
+    def __init__(self, x, y, directory):
+        self.sprites = load_sprite_sheets(directory, 24, 12, CAR_SCALE)
+        self.name = directory
+        self.direction = "left"
+        self.rect = self.sprites[self.name + "_" + self.direction][0].get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = self.sprites[self.name + "_" + self.direction][0].get_width()
+        self.height = self.sprites[self.name + "_" + self.direction][0].get_height()
+        self.hitbox = [[self.rect.x, self.rect.y + 12 * CAR_SCALE // 2.5, CAR_HITBOX, CAR_HITBOX], [self.rect.x + 24 * CAR_SCALE // 3, self.rect.y, CAR_HITBOX, CAR_HITBOX]]
+
+        self.animation_count = 5
+
+    def move(self):
+        self.rect.x -= CAR_SPEED
+        self.hitbox[0][0] -= CAR_SPEED
+        self.hitbox[1][0] -= CAR_SPEED
+
+    def update_sprite(self):
+        self.animation_count += 1
+
+    def draw(self):
+
+        SCREEN.blit(self.sprites[self.name + "_" + self.direction][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[self.name + "_" + self.direction])], self.rect)
+        #pg.draw.rect(SCREEN, RED, self.hitbox[0])
+        #pg.draw.rect(SCREEN, RED, self.hitbox[1])
+
+
 
 class Player:
     def __init__(self, x, y):
