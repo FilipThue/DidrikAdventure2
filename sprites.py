@@ -77,10 +77,32 @@ class Car:
         self.animation_count += 1
 
     def draw(self):
-
+        # pg.draw.rect(SCREEN, RED, self.hitbox[0])
+        # pg.draw.rect(SCREEN, RED, self.hitbox[1])
         SCREEN.blit(self.sprites[self.name + "_" + self.direction][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[self.name + "_" + self.direction])], self.rect)
-        #pg.draw.rect(SCREEN, RED, self.hitbox[0])
-        #pg.draw.rect(SCREEN, RED, self.hitbox[1])
+
+
+class Truck:
+    def __init__(self, x, y, directory):
+        self.sprites = load_sprite_sheets(directory, 48, 36, CAR_SCALE)
+        self.name = directory
+        self.direction = "left"
+        self.rect = self.sprites[self.name + "_" + self.direction][0].get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = self.sprites[self.name + "_" + self.direction][0].get_width()
+        self.height = self.sprites[self.name + "_" + self.direction][0].get_height()
+        self.animation_count = 5
+
+    def move(self):
+        self.rect.x -= CAR_SPEED
+
+    def update_sprite(self):
+        self.animation_count += 1
+
+    def draw(self):
+        # pg.draw.rect(SCREEN, RED, self.rect)
+        SCREEN.blit(self.sprites[self.name + "_" + self.direction][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[self.name + "_" + self.direction])], self.rect)
 
 
 
