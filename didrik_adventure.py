@@ -162,7 +162,7 @@ class Level4(Level_scene):
     def __init__(self, lives):
         super().__init__(world_data_4, START_POS, lives)
         self.cars = [Car(WIDTH // 2, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "car"), Car(WIDTH // 2 + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet"), Car(WIDTH // 2 + CAR_SPACING + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet")]
-
+        self.truck = Truck(3500, HEIGHT - TILE_SIZE - 36 * CAR_SCALE, "lorry")
 
     def update(self):
         self.common_update()
@@ -177,7 +177,15 @@ class Level4(Level_scene):
                     else:
                         return Loose_screen()
 
+        if self.player.rect.x < WIDTH - self.player.width // 2:
+            if self.player.rect.colliderect(self.truck.rect):
+                if self.lives == 1:
+                    return Level4(self.lives)
+                else:
+                    return Loose_screen()
 
+        self.truck.update_sprite()
+        self.truck.move()
 
         if self.player.rect.x > WIDTH:
             return Level5(self.lives)
@@ -187,6 +195,7 @@ class Level4(Level_scene):
         self.player.draw()
         for car in self.cars:
             car.draw()
+        self.truck.draw()
         return super().draw()
 
 
@@ -411,12 +420,12 @@ class Start_screen(Scene):
                 if self.last_chance_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(
                         mouse_pos):
                     # Start hovedspillet med 1 liv
-                    return Level4(0)
+                    return Level1(0)
 
                 elif self.normal_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(
                         mouse_pos):
                     # Start hovedspillet med 5 liv
-                    return Level4(1)
+                    return Level1(1)
 
 class Loose_screen(Scene):
     def __init__(self):
