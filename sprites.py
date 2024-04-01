@@ -119,44 +119,24 @@ class Player:
         for tile in world.tile_list:
             # x
             if tile[1].colliderect(self.rect.x  + delta[0], self.rect.y, self.width, self.height):  # tile[0] er bildet
-                if tile[2] == "trap":
-                    if world.lives > 0:
-                        print(world.lives)
-                        self.rect.x = START_POS[0]
-                        self.rect.y = START_POS[1]
-
-                    else:
-                        world.lives -= 1
-
-
-                else:
-                    delta[0] = 0
-                    self.moving_x = False
-                    self.current_animation = "didrik_chilling"
+                delta[0] = 0
+                self.moving_x = False
+                self.current_animation = "didrik_chilling"
 
             # y
             if tile[1].colliderect(self.rect.x, self.rect.y + delta[1], self.width, self.height):
-                if tile[2] == "trap":
-                    if world.lives > 0:
-                        print(world.lives)
-                        self.rect.x = START_POS[0]
-                        self.rect.y = START_POS[1]
+                if self.vel_y >= 0:  # sjekker om han står på bakken
+                    delta[1] = tile[1].top - self.rect.bottom
+                    self.jumped = False
+                    self.vel_y = 0
+                elif self.vel_y < 0:  # sjekker om han dunker hodet
+                    delta[1] = tile[1].bottom - self.rect.top
+                    self.vel_y = 0
 
-                    else:
-                        world.lives -= 1
-
-                else:
-                    if self.vel_y >= 0:  # sjekker om han står på bakken
-                        delta[1] = tile[1].top - self.rect.bottom
-                        self.jumped = False
-                        self.vel_y = 0
-                    elif self.vel_y < 0:  # sjekker om han dunker hodet
-                        delta[1] = tile[1].bottom - self.rect.top
-                        self.vel_y = 0
-
-                if self.rect.x < 0:
-                    self.rect.x = 0
-                    self.current_animation = "didrik_chilling"
+            if self.rect.x < 0:
+                self.rect.x = 0
+                self.moving_x = False
+                self.current_animation = "didrik_chilling"
 
         self.rect.x += delta[0]
         self.rect.y += delta[1]
