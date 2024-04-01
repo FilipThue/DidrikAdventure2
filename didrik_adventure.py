@@ -177,9 +177,32 @@ class Level4(Level_scene):
 class Level3(Level_scene):
     def __init__(self, lives):
         super().__init__(world_data_3, START_POS, lives)
+        self.spike = Spike(-1 * TILE_SIZE, 12 * TILE_SIZE)
+        self.homing_spike = False
 
     def update(self):
         self.common_update()
+
+        if self.player.vel_y < 0:
+            self.homing_spike = True
+
+        if self.player.rect.x > 700:
+            self.homing_spike = True
+
+        if self.homing_spike:
+            if self.spike.hitbox[0] < self.player.rect.x:
+                if self.player.rect.x - self.spike.hitbox[0] < 60:
+                    self.spike.hitbox[0] += WALKING_SPEED
+                    self.spike.x += WALKING_SPEED
+                else:
+                    self.spike.hitbox[0] += SPIKE_SPEED * 3
+                    self.spike.x += SPIKE_SPEED * 3
+
+        if self.player.rect.colliderect(self.spike.hitbox):
+            if self.lives == 1:
+                return Level3(self.lives)
+            else:
+                return Start_screen()
 
         if self.player.rect.x > WIDTH:
             return Level4(self.lives)
@@ -187,6 +210,7 @@ class Level3(Level_scene):
     def draw(self):
         SCREEN.blit(bg_img_level3, (0, 0))
         self.player.draw()
+        self.spike.draw()
         return super().draw()
 
 
@@ -212,7 +236,9 @@ class Level2(Level_scene):
         self.portals = [Portal(280, 90), Portal(770, 90)]
         self.level_started = 0
         self.trap_activation = 5 * TILE_SIZE
-        self.spikes = [Spike(8 * TILE_SIZE, 8 * TILE_SIZE), Spike(19 * TILE_SIZE, 9 * TILE_SIZE), Spike(9 * TILE_SIZE, 4 * TILE_SIZE)]
+        self.spikes = [Spike(8 * TILE_SIZE, 8 * TILE_SIZE), Spike(19 * TILE_SIZE, 9 * TILE_SIZE), Spike(9 * TILE_SIZE, 4 * TILE_SIZE), Spike(10 * TILE_SIZE, 13 * TILE_SIZE)]
+        for i in range(6):
+            self.spikes.append(Spike((12 + i) * TILE_SIZE, 13 * TILE_SIZE))
         self.trap_timer = 0
         self.trap_activated = False
 
@@ -234,12 +260,12 @@ class Level2(Level_scene):
         if self.trap_timer > 90:
             if self.trap_activated:
                 self.trap_activated = False
-                if len(self.spikes) > 3:
+                if len(self.spikes) > 10:
                     self.spikes.pop(3)
                 self.trap_timer = 0
             else:
                 self.trap_activated = True
-                if len(self.spikes) < 4:
+                if len(self.spikes) < 11:
                     self.spikes.insert(3, Spike(9 * TILE_SIZE, 4 * TILE_SIZE))
                 self.trap_timer = 0
 
@@ -252,8 +278,10 @@ class Level2(Level_scene):
 
         for i in range(len(self.spikes)):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
-                self.player.rect.x = START_POS[0]
-                self.player.rect.y = START_POS[1]
+                if self.lives == 1:
+                    return Level2(self.lives)
+                else:
+                    return Start_screen()
 
         # portalen
         if 280 < self.player.rect.x < 300 and 90 < self.player.rect.y < 200:  # definerer portalinngangen
@@ -285,12 +313,19 @@ class Level1(Level_scene):
         super().__init__(world_data_1, START_POS, lives)
         self.hidden_tile_x = 17 * TILE_SIZE
         self.props = []
+        self.spike = Spike(13 * TILE_SIZE, 12 * TILE_SIZE)
         for i in range (3):
             self.props.append(Prop(self.hidden_tile_x + TILE_SIZE * i, HEIGHT-TILE_SIZE, TILE_SIZE, TILE_SIZE, ground_img))
 
 
     def update(self):
         self.common_update()
+
+        if self.player.rect.colliderect(self.spike.hitbox):
+            if self.lives == 1:
+                return Level1(self.lives)
+            else:
+                return Start_screen()
 
 
         if self.player.rect.y > HEIGHT:
@@ -306,6 +341,7 @@ class Level1(Level_scene):
                 self.props[i].draw()
 
         self.player.draw()
+        self.spike.draw()
         return super().draw()
 
 
@@ -371,4 +407,5 @@ game = Game(Start_screen())
 game.run()
 
 pygame.quit()
+
 
