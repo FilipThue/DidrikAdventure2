@@ -18,7 +18,7 @@ bg_img_level4 = pygame.image.load('assets/backdrops/level4.png')
 bg_img_level5 = pygame.image.load('assets/backdrops/level5.png')
 
 
-def die():
+def die_sound():
     pygame.mixer.music.load("assets/sound/damage.mp3")
     pygame.mixer.music.play()
 
@@ -379,7 +379,7 @@ class Level2(Level_scene):
 
         for i in range(len(self.spikes)):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
-                die()
+                die_sound()
                 if self.lives == 1:
                     return Level2(self.lives)
                 else:
@@ -427,7 +427,7 @@ class Level1(Level_scene):
         self.common_update()
 
         if self.player.rect.colliderect(self.spike.hitbox):
-            die()
+            die_sound()
             if self.lives == 1:
                 return Level1(self.lives)
             else:
