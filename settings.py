@@ -9,6 +9,7 @@ SCREEN = pg.display.set_mode((WIDTH, HEIGHT))
 
 START_COLOR = (0, 70, 30)
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
 BUTTON_WIDTH = 500
@@ -37,6 +38,12 @@ TERMINAL_VELOCITY = 20
 CAR_SPEED = 7
 CAR_SPACING = 300
 CAR_HITBOX = 24 * CAR_SCALE // 1.8
+
+ARNE_SPEED = 3
+TALKING_DISTANCE = 100
+BUBBLE_SIZE = 7
+ARNE_TALKING = WIDTH // 6 - TALKING_DISTANCE
+DIDRIK_TALKING = WIDTH // 2 - TALKING_DISTANCE
 
 START_POS = (100, HEIGHT - TILE_SIZE - 56)
 START_POS_2 = (100, 30)
@@ -103,10 +110,10 @@ world_data_2_5 =[
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+[0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+[0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+[0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+[0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
@@ -166,5 +173,3 @@ ground_img = pg.image.load('assets/img/gulv_skole.png')
 spike_img = pg.image.load('assets/img/spikes.png')
 checkpoint_life_img = pg.image.load('assets/img/didriklife_checkpoint.png')
 one_life_img = pg.image.load('assets/img/didriklife_one.png')
-
-
