@@ -18,6 +18,11 @@ bg_img_level4 = pygame.image.load('assets/backdrops/level4.png')
 bg_img_level5 = pygame.image.load('assets/backdrops/level5.png')
 
 
+def die():
+    pygame.mixer.music.load("assets/sound/damage.mp3")
+    pygame.mixer.music.play()
+
+
 class World:
     def __init__(self, data, lives):
         self.tile_list = []
@@ -88,7 +93,7 @@ class Game:
             pygame.display.update()
 
 
-#/------------------------------------------------------
+# /------------------------------------------------------
 
 class Prop:
     def __init__(self, x, y, w, h, img):
@@ -102,7 +107,6 @@ class Prop:
         SCREEN.blit(self.img, (self.x, self.y))
 
 
-
 class Spike:
     def __init__(self, x, y):
         self.img = pygame.transform.scale(spike_img, (TILE_SIZE, TILE_SIZE))
@@ -113,10 +117,30 @@ class Spike:
 
     def draw(self):
         SCREEN.blit(self.img, (self.x, self.y))
-        pygame.draw.rect(SCREEN, RED, self.hitbox, 2)
+        # pygame.draw.rect(SCREEN, RED, self.hitbox, 2)
 
 
-#/------------------------------------------------------
+class Speech_bubble:
+    def __init__(self, x, y, person, text):
+        self.img = pg.image.load('assets/img/speech.png').convert_alpha()
+        self.img = pygame.transform.scale(self.img, (80 * BUBBLE_SIZE, 60 * BUBBLE_SIZE))
+
+        if person == "Arne":
+            self.img = pg.transform.flip(self.img, True, False)
+
+        self.x = x
+        self.y = y
+        self.width = self.img.get_width()
+        self.height = self.img.get_height()
+
+        self.text = text
+
+    def draw(self):
+        SCREEN.blit(self.img, (self.x, self.y))
+        draw_text(self.text, font, BLACK, SCREEN, self.x + self.width // 2, self.y + self.height // 2)
+
+
+# /------------------------------------------------------
 
 
 class Scene:
@@ -149,8 +173,7 @@ class Level5(Level_scene):
         self.common_update()
 
         if self.player.rect.x > WIDTH:
-            pass
-            # return Level3()
+            return Start_screen()
 
     def draw(self):
         SCREEN.blit(bg_img_level5, (0, 0))
@@ -161,11 +184,29 @@ class Level5(Level_scene):
 class Level4(Level_scene):
     def __init__(self, lives):
         super().__init__(world_data_4, START_POS, lives)
-        self.cars = [Car(WIDTH // 2, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "car"), Car(WIDTH // 2 + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet"), Car(WIDTH // 2 + CAR_SPACING + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet")]
-        self.truck = Truck(3500, HEIGHT - TILE_SIZE - 36 * CAR_SCALE, "lorry")
+        self.cars = [Car(WIDTH // 2, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "car"),
+                     Car(WIDTH // 2 + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet"),
+                     Car(WIDTH // 2 + CAR_SPACING + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet")]
+        self.truck = Truck(-6000, HEIGHT - TILE_SIZE - 36 * CAR_SCALE, "lorry")
+        self.Arne = Arne(-50, HEIGHT - TILE_SIZE - 8 * PLAYER_SCALE)
+        self.arne_activate = False
+        self.speech_bubbles = [Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", "Halla mann!"),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", "Skjer a' Arne??"),
+                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", "Bare ute og jogger en tur"),
+                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", "Må jo oprettholde Strava-streaken ;)"),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", "Personlig går jeg for disc golf"),
+                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne",
+                                             "Har du retta noen prøver i det siste?"),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik",
+                                             "Skal høre en it-presentasjon nå klokken 08:15"),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", "Må stikke, sneiksss! :)")]
+        self.new_bubble_timer = 0
+        self.bubble_count = 0
+        self.pressed = False
 
     def update(self):
         self.common_update()
+        self.Arne.update()
         for car in self.cars:
             car.move()
             car.update_sprite()
@@ -176,6 +217,27 @@ class Level4(Level_scene):
                         return Level4(self.lives)
                     else:
                         return Loose_screen()
+
+        # Arne
+        if self.player.rect.x > WIDTH // 2 and self.arne_activate == False:
+            self.arne_activate = True
+            self.Arne.walking = ARNE_SPEED
+            self.player.talking = True
+
+        self.new_bubble_timer += 1
+
+        if self.player.rect.x - self.Arne.rect.x < TALKING_DISTANCE:
+            self.Arne.walking = 0
+            self.player.direction = "left"
+
+            if self.new_bubble_timer > 6:
+                key = py.key.get_pressed()
+                if (key[py.K_UP] or key[py.K_SPACE]) and self.pressed == False:
+                    self.bubble_count += 1
+                    self.new_bubble_timer = 0
+                    self.pressed = True
+                if not (key[py.K_UP] or key[py.K_SPACE]):
+                    self.pressed = False
 
         if self.player.rect.x < WIDTH - self.player.width // 2:
             if self.player.rect.colliderect(self.truck.rect):
@@ -196,6 +258,11 @@ class Level4(Level_scene):
         for car in self.cars:
             car.draw()
         self.truck.draw()
+        self.Arne.draw()
+
+        if self.player.talking and self.player.direction == "left":
+            draw_text("Trykk på mellomromstasten", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
+            self.speech_bubbles[self.bubble_count].draw()
         return super().draw()
 
 
@@ -242,9 +309,19 @@ class Level3(Level_scene):
 class Level2_5(Level_scene):
     def __init__(self, lives):
         super().__init__(world_data_2_5, START_POS, lives)
+        self.spikes = []
+        for i in range(1, 8):
+            self.spikes.append(Spike(3 * i * TILE_SIZE, 8 * TILE_SIZE))
 
     def update(self):
         self.common_update()
+
+        for i in range(len(self.spikes)):
+            if self.player.rect.colliderect(self.spikes[i].hitbox):
+                if self.lives == 1:
+                    return Level2_5(self.lives)
+                else:
+                    return Loose_screen()
 
         if self.player.rect.y > HEIGHT:
             return Level4(self.lives)
@@ -252,6 +329,8 @@ class Level2_5(Level_scene):
     def draw(self):
         SCREEN.blit(bg_img_level2_5, (0, 0))
         self.player.draw()
+        for i in range(len(self.spikes)):
+            self.spikes[i].draw()
         return super().draw()
 
 
@@ -261,18 +340,17 @@ class Level2(Level_scene):
         self.portals = [Portal(280, 90), Portal(770, 90)]
         self.level_started = 0
         self.trap_activation = 5 * TILE_SIZE
-        self.spikes = [Spike(8 * TILE_SIZE, 8 * TILE_SIZE), Spike(19 * TILE_SIZE, 9 * TILE_SIZE), Spike(9 * TILE_SIZE, 4 * TILE_SIZE), Spike(10 * TILE_SIZE, 13 * TILE_SIZE)]
+        self.spikes = [Spike(8 * TILE_SIZE, 8 * TILE_SIZE), Spike(19 * TILE_SIZE, 9 * TILE_SIZE),
+                       Spike(9 * TILE_SIZE, 4 * TILE_SIZE), Spike(10 * TILE_SIZE, 13 * TILE_SIZE)]
         for i in range(6):
             self.spikes.append(Spike((12 + i) * TILE_SIZE, 13 * TILE_SIZE))
         self.trap_timer = 0
         self.trap_activated = False
 
-
     def update(self):
         self.common_update()
         for i in range(2):
             self.portals[i].update_sprite()
-
 
         # feller
         if self.player.rect.x > self.trap_activation - self.player.width:
@@ -299,10 +377,9 @@ class Level2(Level_scene):
                 self.spikes[2].hitbox[0] += SPIKE_SPEED
                 self.spikes[2].x += SPIKE_SPEED
 
-
-
         for i in range(len(self.spikes)):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
+                die()
                 if self.lives == 1:
                     return Level2(self.lives)
                 else:
@@ -311,7 +388,6 @@ class Level2(Level_scene):
         # portalen
         if 280 < self.player.rect.x < 300 and 90 < self.player.rect.y < 200:  # definerer portalinngangen
             self.player.rect.x = 800
-
 
         if self.player.rect.x > WIDTH:
             return Level3(self.lives)
@@ -332,26 +408,30 @@ class Level2(Level_scene):
         return super().draw()
 
 
-
 class Level1(Level_scene):
     def __init__(self, lives):
         super().__init__(world_data_1, START_POS, lives)
         self.hidden_tile_x = 17 * TILE_SIZE
         self.props = []
         self.spike = Spike(13 * TILE_SIZE, 12 * TILE_SIZE)
-        for i in range (3):
-            self.props.append(Prop(self.hidden_tile_x + TILE_SIZE * i, HEIGHT-TILE_SIZE, TILE_SIZE, TILE_SIZE, ground_img))
+        for i in range(3):
+            self.props.append(
+                Prop(self.hidden_tile_x + TILE_SIZE * i, HEIGHT - TILE_SIZE, TILE_SIZE, TILE_SIZE, ground_img))
 
+        pygame.mixer.init()
+        pygame.mixer.music.load("assets/sound/didrikadventure2theme.mp3")
+        pygame.mixer.music.play(loops=10)
+        pygame.mixer.music.queue("assets/sound/doneplaying.mp3")
 
     def update(self):
         self.common_update()
 
         if self.player.rect.colliderect(self.spike.hitbox):
+            die()
             if self.lives == 1:
                 return Level1(self.lives)
             else:
                 return Loose_screen()
-
 
         if self.player.rect.y > HEIGHT:
             return Level2(self.lives)
@@ -391,56 +471,86 @@ class Start_screen(Scene):
     normal_mode_hover_img = pygame.transform.scale(normal_mode_hover_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
 
     # Posisjoner for knappene
-    normal_mode_img_x = (WIDTH - BUTTON_WIDTH * 2 - BUTTON_SPACING) // 2
-    last_chance_mode_img_x = normal_mode_img_x + BUTTON_WIDTH + BUTTON_SPACING
-
-    running = True
+    last_chance_mode_img_x = (WIDTH - BUTTON_WIDTH * 2 - BUTTON_SPACING) // 2
+    normal_mode_img_x = last_chance_mode_img_x + BUTTON_WIDTH + BUTTON_SPACING
 
     def update(self):
         SCREEN.fill(START_COLOR)
         draw_text("Velg vanskelighetsgrad:", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
 
         # Tegn standardbilder
-        SCREEN.blit(self.normal_mode_img, (self.last_chance_mode_img_x, BUTTON_y))
-        SCREEN.blit(self.last_chance_mode_img, (self.normal_mode_img_x, BUTTON_y))
+        SCREEN.blit(self.normal_mode_img, (self.normal_mode_img_x, BUTTON_y))
+        SCREEN.blit(self.last_chance_mode_img, (self.last_chance_mode_img_x, BUTTON_y))
 
         # Hent museposisjonen
         mouse_pos = pygame.mouse.get_pos()
 
         # Sjekk for hover-effekt og tegn hover-bilder
-        if self.normal_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(mouse_pos):
-            SCREEN.blit(self.normal_mode_hover_img, (self.last_chance_mode_img_x, BUTTON_y))
-        if self.last_chance_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(mouse_pos):
-            SCREEN.blit(self.last_chance_mode_hover_img, (self.normal_mode_img_x, BUTTON_y))
+        if self.normal_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(mouse_pos):
+            SCREEN.blit(self.normal_mode_hover_img, (self.normal_mode_img_x, BUTTON_y))
+        if self.last_chance_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(mouse_pos):
+            SCREEN.blit(self.last_chance_mode_hover_img, (self.last_chance_mode_img_x, BUTTON_y))
 
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.last_chance_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(
+                if self.last_chance_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(
                         mouse_pos):
                     # Start hovedspillet med 1 liv
                     return Level1(0)
 
-                elif self.normal_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(
+                elif self.normal_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(
                         mouse_pos):
                     # Start hovedspillet med 5 liv
                     return Level1(1)
 
+
 class Loose_screen(Scene):
+    restart_img = pygame.image.load("assets/img/restart.png").convert_alpha()
+    restart_hover_img = pygame.image.load("assets/img/restart_hover.png").convert_alpha()
+
+    restart_img = pygame.transform.scale(restart_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
+    restart_hover_img = pygame.transform.scale(restart_hover_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
+
+    restart_img_x = (WIDTH / 2 - BUTTON_WIDTH / 2)
+
     def __init__(self):
+        # SCREEN.fill(START_COLOR)
         self.bg_img = pygame.image.load("assets/backdrops/you_loose.png")
+        self.restart_hover = False  # Legg til en tilstand for hover-effekten
 
     def update(self):
-        print("her skal ett eller annent gjøre dette: return Start_screen")
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Sjekk om musen er over restart-knappen
+        if self.restart_img.get_rect(topleft=(self.restart_img_x, BUTTON_y)).collidepoint(mouse_pos):
+            self.restart_hover = True
+        else:
+            self.restart_hover = False
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Sjekk om musen klikket på restart-knappen
+                if self.restart_img.get_rect(topleft=(self.restart_img_x, BUTTON_y)).collidepoint(mouse_pos):
+                    # Start hovedspillet med 1 liv
+                    return Start_screen()
 
     def draw(self):
         SCREEN.blit(self.bg_img, (0, 0))
         draw_text("Du tapte", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
 
+        # Tegn restart-knappen basert på hover-tilstanden
+        if self.restart_hover:
+            SCREEN.blit(self.restart_hover_img, (self.restart_img_x, BUTTON_y))
+        else:
+            SCREEN.blit(self.restart_img, (self.restart_img_x, BUTTON_y))
 
 
 game = Game(Start_screen())
 game.run()
 
 pygame.quit()
+
