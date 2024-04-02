@@ -86,7 +86,7 @@ class Truck:
     def __init__(self, x, y, directory):
         self.sprites = load_sprite_sheets(directory, 48, 36, CAR_SCALE)
         self.name = directory
-        self.direction = "left"
+        self.direction = "right"
         self.rect = self.sprites[self.name + "_" + self.direction][0].get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -104,6 +104,26 @@ class Truck:
         # pg.draw.rect(SCREEN, RED, self.rect)
         SCREEN.blit(self.sprites[self.name + "_" + self.direction][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[self.name + "_" + self.direction])], self.rect)
 
+
+class Arne:
+    def __init__(self, x, y):
+        self.sprites = load_sprite_sheets("Arne", 5, 8, PLAYER_SCALE)
+        self.rect = self.sprites["Arne_right"][0].get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = self.sprites["Arne_right"][0].get_width()
+        self.height = self.sprites["Arne_right"][0].get_height()
+        self.direction = "right"
+        self.animation_count = 10
+        self.walking = 0
+
+    def update(self):
+        if self.walking > 0:
+            self.animation_count += 1
+        self.rect.x += self.walking
+
+    def draw(self):
+        SCREEN.blit(self.sprites[f"Arne_{self.direction}"][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[f"Arne_{self.direction}"])], self.rect)
 
 
 class Player:
@@ -123,6 +143,8 @@ class Player:
         self.jumped = False
         self.moving_x = False
 
+        self.talking = False
+
         # print(self.sprites)
 
 
@@ -131,58 +153,60 @@ class Player:
         delta = [0, 0]
         self.current_animation = "didrik_chilling"
 
-        if (key[py.K_UP] or key[py.K_SPACE]) and self.jumped == False:
-            self.vel_y = - JUMP_SPEED
-            self.jumped = True
+        if not self.talking:
+
+            if (key[py.K_UP] or key[py.K_SPACE]) and self.jumped == False:
+                self.vel_y = - JUMP_SPEED
+                self.jumped = True
 
 
 
-        if (key[py.K_UP] or key[py.K_SPACE]) == False and self.vel_y != 0:
-            self.jumped = True
+            if (key[py.K_UP] or key[py.K_SPACE]) == False and self.vel_y != 0:
+                self.jumped = True
 
-        if self.jumped:
-            self.current_animation = "didrik_jumping"
-
-
-        if key[py.K_LEFT] or key[py.K_a]:
-            delta[0] -= WALKING_SPEED
-
-            if not self.jumped:
-                self.current_animation = "didrik_walking"
-                self.direction = "left"
-                self.animation_count += 1
+            if self.jumped:
+                self.current_animation = "didrik_jumping"
 
 
-        if key[py.K_RIGHT] or key[py.K_d]:
-            delta[0] += WALKING_SPEED
+            if key[py.K_LEFT] or key[py.K_a]:
+                delta[0] -= WALKING_SPEED
 
-            if not self.jumped:
-                self.current_animation = "didrik_walking"
-                self.direction = "right"
-                self.animation_count += 1
+                if not self.jumped:
+                    self.current_animation = "didrik_walking"
+                    self.direction = "left"
+                    self.animation_count += 1
 
-        self.vel_y += GRAVITATIONAL_ACCELERATION
-        if self.vel_y > TERMINAL_VELOCITY:
-            self.vel_y = TERMINAL_VELOCITY
-        delta[1] += self.vel_y
 
-        #kollisjoner
-        for tile in world.tile_list:
-            # x
-            if tile[1].colliderect(self.rect.x  + delta[0], self.rect.y, self.width, self.height):  # tile[0] er bildet
-                delta[0] = 0
-                self.moving_x = False
-                self.current_animation = "didrik_chilling"
+            if key[py.K_RIGHT] or key[py.K_d]:
+                delta[0] += WALKING_SPEED
 
-            # y
-            if tile[1].colliderect(self.rect.x, self.rect.y + delta[1], self.width, self.height):
-                if self.vel_y >= 0:  # sjekker om han står på bakken
-                    delta[1] = tile[1].top - self.rect.bottom
-                    self.jumped = False
-                    self.vel_y = 0
-                elif self.vel_y < 0:  # sjekker om han dunker hodet
-                    delta[1] = tile[1].bottom - self.rect.top
-                    self.vel_y = 0
+                if not self.jumped:
+                    self.current_animation = "didrik_walking"
+                    self.direction = "right"
+                    self.animation_count += 1
+
+            self.vel_y += GRAVITATIONAL_ACCELERATION
+            if self.vel_y > TERMINAL_VELOCITY:
+                self.vel_y = TERMINAL_VELOCITY
+            delta[1] += self.vel_y
+
+            #kollisjoner
+            for tile in world.tile_list:
+                # x
+                if tile[1].colliderect(self.rect.x  + delta[0], self.rect.y, self.width, self.height):  # tile[0] er bildet
+                    delta[0] = 0
+                    self.moving_x = False
+                    self.current_animation = "didrik_chilling"
+
+                # y
+                if tile[1].colliderect(self.rect.x, self.rect.y + delta[1], self.width, self.height):
+                    if self.vel_y >= 0:  # sjekker om han står på bakken
+                        delta[1] = tile[1].top - self.rect.bottom
+                        self.jumped = False
+                        self.vel_y = 0
+                    elif self.vel_y < 0:  # sjekker om han dunker hodet
+                        delta[1] = tile[1].bottom - self.rect.top
+                        self.vel_y = 0
 
             if self.rect.x < 0:
                 self.rect.x = 0
