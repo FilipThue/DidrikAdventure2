@@ -3,7 +3,6 @@ from settings import *
 from os.path import isfile, join
 from os import listdir
 
-
 def flip(sprites):
     return [pg.transform.flip(sprite, True, False) for sprite in sprites]
 
