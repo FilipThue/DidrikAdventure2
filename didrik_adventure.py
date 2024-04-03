@@ -9,18 +9,12 @@ font = pg.font.Font("assets/font/Grand9KPixel.ttf", 40)
 
 pygame.display.set_caption("Didrik Adventure 2")
 
-# load images
-bg_img = pygame.image.load('assets/backdrops/level1.png')
-bg_img_level2 = pygame.image.load('assets/backdrops/level2.png')
-bg_img_level2_5 = pygame.image.load('assets/backdrops/level2_5.png')
-bg_img_level3 = pygame.image.load('assets/backdrops/level3.png')
-bg_img_level4 = pygame.image.load('assets/backdrops/level4.png')
-bg_img_level5 = pygame.image.load('assets/backdrops/level5.png')
+damage = pygame.mixer.Sound(os.path.join('assets/sound/damage.mp3'))
+music = pygame.mixer.music.load(os.path.join('assets/sound/didrikadventure2theme.mp3'))
+pygame.mixer.music.play(-1)
 
+timer = [0, 0, 0]
 
-def die_sound():
-    pygame.mixer.music.load("assets/sound/damage.mp3")
-    pygame.mixer.music.play()
 
 
 class World:
@@ -74,6 +68,7 @@ class World:
 class Game:
     def __init__(self, start_scene):
         self.scene = start_scene
+
 
     def run(self):
         run = True
@@ -137,7 +132,11 @@ class Speech_bubble:
 
     def draw(self):
         SCREEN.blit(self.img, (self.x, self.y))
-        draw_text(self.text, font, BLACK, SCREEN, self.x + self.width // 2, self.y + self.height // 2)
+        if type(self.text) == list:
+            draw_text(self.text[0], font, BLACK, SCREEN, self.x + self.width // 2, self.y + self.height // 3)
+            draw_text(self.text[1], font, BLACK, SCREEN, self.x + self.width // 2, self.y + (self.height // 4) * 2 )
+        else:
+            draw_text(self.text, font, BLACK, SCREEN, self.x + self.width // 2, self.y + self.height // 2)
 
 
 # /------------------------------------------------------
@@ -152,53 +151,81 @@ class Scene:
 
 
 class Level_scene(Scene):
-    def __init__(self, world_d, player_pos, lives):
+    def __init__(self, world_d, player_pos, lives, timer):
         self.world = World(world_d, lives)
         self.player = Player(player_pos[0], player_pos[1])
         self.lives = lives
+        self.timer = timer
 
     def common_update(self):
         self.world.update()
         self.player.update(self.world)
 
+        self.timer[0] += 1
+
+        if self.timer[0] == 60:
+            self.timer[1] += 1
+            self.timer[0] = 0
+
+        if self.timer[1] == 60:
+            self.timer[2] += 1
+            self.timer[1] = 0
+
+        if self.timer[2] >= 1:
+            self.lives = -1
+
+
+
+
     def draw(self):
         self.world.draw()
+        draw_text(f"{4 - self.timer[2]} min {59 - self.timer[1]} sec", font, WHITE, SCREEN, TILE_SIZE * 1.1 , 0, True)
 
 
 class Level5(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_5, START_POS, lives)
+        super().__init__(world_data_5, START_POS, lives, timer)
+
+    def common_update(self):
+        self.world.update()
+        self.player.update(self.world)
 
     def update(self):
         self.common_update()
 
         if self.player.rect.x > WIDTH:
             return Start_screen()
+        if self.lives < 0:
+            return Loose_screen()
 
     def draw(self):
         SCREEN.blit(bg_img_level5, (0, 0))
+        draw_text(f"Gratulerer, du rakk timen!", font, GOLD, SCREEN, WIDTH // 2, TILE_SIZE // 1.5)
+        draw_text(f"Du hadde {4 - self.timer[2]} minutter og {59 - self.timer[1]},{self.timer[0]*6//10} sekunder til gode", font, GOLD, SCREEN, WIDTH // 2, HEIGHT // 4)
+        draw_text(f"Start på nytt", font, WHITE, SCREEN, WIDTH - (TILE_SIZE * 3), HEIGHT - (TILE_SIZE * 4.5))
+        SCREEN.blit(pil, (WIDTH - (TILE_SIZE * 4), HEIGHT - (TILE_SIZE * 4)))
         self.player.draw()
-        return super().draw()
+        self.world.draw()
 
 
 class Level4(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_4, START_POS, lives)
+        super().__init__(world_data_4, START_POS, lives, timer)
         self.cars = [Car(WIDTH // 2, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "car"),
                      Car(WIDTH // 2 + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet"),
                      Car(WIDTH // 2 + CAR_SPACING + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet")]
-        self.truck = Truck(-6000, HEIGHT - TILE_SIZE - 36 * CAR_SCALE, "lorry")
+        self.truck = Truck(-5090, HEIGHT - TILE_SIZE - 36 * CAR_SCALE, "lorry")
         self.Arne = Arne(-50, HEIGHT - TILE_SIZE - 8 * PLAYER_SCALE)
         self.arne_activate = False
         self.speech_bubbles = [Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", "Halla mann!"),
                                Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", "Skjer a' Arne??"),
-                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", "Bare ute og jogger en tur"),
-                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", "Må jo oprettholde Strava-streaken ;)"),
-                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", "Personlig går jeg for disc golf"),
-                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne",
-                                             "Har du retta noen prøver i det siste?"),
-                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik",
-                                             "Skal høre en it-presentasjon nå klokken 08:15"),
+                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", ["Bare ute og", "jogger en tur"]),
+                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne", ["Må jo oprettholde", "Strava-streaken ;)"]),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", ["Personlig foretrekker", "jeg disc golf"]),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik",["Fikk startet sesongen", "nå i påsken"]),
+                               Speech_bubble(ARNE_TALKING, HEIGHT // 4, "Arne",["Har du retta noen", "prøver i det siste?"]),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik",["Skal høre en it-", "presentasjon 08:15"]),
+                               Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", ["Kan ikke stå her i veien", "og snakke dessverre"]),
                                Speech_bubble(DIDRIK_TALKING, HEIGHT // 4, "Didrik", "Må stikke, sneiksss! :)")]
         self.new_bubble_timer = 0
         self.bubble_count = 0
@@ -213,6 +240,7 @@ class Level4(Level_scene):
 
             for hitbox in car.hitbox:
                 if self.player.rect.colliderect(hitbox):
+                    pygame.mixer.Sound.play(damage)
                     if self.lives == 1:
                         return Level4(self.lives)
                     else:
@@ -230,17 +258,22 @@ class Level4(Level_scene):
             self.Arne.walking = 0
             self.player.direction = "left"
 
-            if self.new_bubble_timer > 6:
-                key = py.key.get_pressed()
-                if (key[py.K_UP] or key[py.K_SPACE]) and self.pressed == False:
-                    self.bubble_count += 1
-                    self.new_bubble_timer = 0
-                    self.pressed = True
-                if not (key[py.K_UP] or key[py.K_SPACE]):
-                    self.pressed = False
+            if self.bubble_count < len(self.speech_bubbles):
+                if self.new_bubble_timer > 6:
+                    key = py.key.get_pressed()
+                    if (key[py.K_UP] or key[py.K_SPACE]) and self.pressed == False:
+                        self.bubble_count += 1
+                        self.new_bubble_timer = 0
+                        self.pressed = True
+                    if not (key[py.K_UP] or key[py.K_SPACE]):
+                        self.pressed = False
+
+            else:
+                self.player.talking = False
 
         if self.player.rect.x < WIDTH - self.player.width // 2:
             if self.player.rect.colliderect(self.truck.rect):
+                pygame.mixer.Sound.play(damage)
                 if self.lives == 1:
                     return Level4(self.lives)
                 else:
@@ -252,6 +285,9 @@ class Level4(Level_scene):
         if self.player.rect.x > WIDTH:
             return Level5(self.lives)
 
+        if self.lives < 0:
+            return Loose_screen()
+
     def draw(self):
         SCREEN.blit(bg_img_level4, (0, 0))
         self.player.draw()
@@ -260,7 +296,7 @@ class Level4(Level_scene):
         self.truck.draw()
         self.Arne.draw()
 
-        if self.player.talking and self.player.direction == "left":
+        if self.player.talking and self.player.direction == "left" and self.bubble_count < len(self.speech_bubbles):
             draw_text("Trykk på mellomromstasten", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
             self.speech_bubbles[self.bubble_count].draw()
         return super().draw()
@@ -268,7 +304,7 @@ class Level4(Level_scene):
 
 class Level3(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_3, START_POS, lives)
+        super().__init__(world_data_3, START_POS, lives, timer)
         self.spike = Spike(-1 * TILE_SIZE, 12 * TILE_SIZE)
         self.homing_spike = False
 
@@ -291,6 +327,7 @@ class Level3(Level_scene):
                     self.spike.x += SPIKE_SPEED * 3
 
         if self.player.rect.colliderect(self.spike.hitbox):
+            pygame.mixer.Sound.play(damage)
             if self.lives == 1:
                 return Level3(self.lives)
             else:
@@ -298,6 +335,9 @@ class Level3(Level_scene):
 
         if self.player.rect.x > WIDTH:
             return Level4(self.lives)
+
+        if self.lives < 0:
+            return Loose_screen()
 
     def draw(self):
         SCREEN.blit(bg_img_level3, (0, 0))
@@ -308,7 +348,7 @@ class Level3(Level_scene):
 
 class Level2_5(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_2_5, START_POS, lives)
+        super().__init__(world_data_2_5, START_POS, lives, timer)
         self.spikes = []
         for i in range(1, 8):
             self.spikes.append(Spike(3 * i * TILE_SIZE, 8 * TILE_SIZE))
@@ -318,6 +358,7 @@ class Level2_5(Level_scene):
 
         for i in range(len(self.spikes)):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
+                pygame.mixer.Sound.play(damage)
                 if self.lives == 1:
                     return Level2_5(self.lives)
                 else:
@@ -325,6 +366,9 @@ class Level2_5(Level_scene):
 
         if self.player.rect.y > HEIGHT:
             return Level4(self.lives)
+
+        if self.lives < 0:
+            return Loose_screen()
 
     def draw(self):
         SCREEN.blit(bg_img_level2_5, (0, 0))
@@ -336,7 +380,7 @@ class Level2_5(Level_scene):
 
 class Level2(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_2, START_POS_2, lives)
+        super().__init__(world_data_2, START_POS_2, lives, timer)
         self.portals = [Portal(280, 90), Portal(770, 90)]
         self.level_started = 0
         self.trap_activation = 5 * TILE_SIZE
@@ -353,7 +397,7 @@ class Level2(Level_scene):
             self.portals[i].update_sprite()
 
         # feller
-        if self.player.rect.x > self.trap_activation - self.player.width:
+        if self.player.rect.x > self.trap_activation - self.player.width * 1.8:
             self.level_started += 1
 
         if self.level_started == 1:
@@ -379,7 +423,7 @@ class Level2(Level_scene):
 
         for i in range(len(self.spikes)):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
-                die_sound()
+                pygame.mixer.Sound.play(damage)
                 if self.lives == 1:
                     return Level2(self.lives)
                 else:
@@ -393,6 +437,9 @@ class Level2(Level_scene):
             return Level3(self.lives)
 
         self.trap_timer += 1
+
+        if self.lives < 0:
+            return Loose_screen()
 
     def draw(self):
         SCREEN.blit(bg_img_level2, (0, 0))
@@ -410,13 +457,16 @@ class Level2(Level_scene):
 
 class Level1(Level_scene):
     def __init__(self, lives):
-        super().__init__(world_data_1, START_POS, lives)
+        super().__init__(world_data_1, START_POS, lives, timer)
         self.hidden_tile_x = 17 * TILE_SIZE
         self.props = []
         self.spike = Spike(13 * TILE_SIZE, 12 * TILE_SIZE)
+        self.timer = [0, 0, 0]
         for i in range(3):
             self.props.append(
                 Prop(self.hidden_tile_x + TILE_SIZE * i, HEIGHT - TILE_SIZE, TILE_SIZE, TILE_SIZE, ground_img))
+
+        self.speech_bubble = Speech_bubble(START_POS[0] * 0.5, HEIGHT // 4, "Didrik", ["Jeg har forsovet meg!", "Har under 5 min på meg!!!"])
 
         pygame.mixer.init()
         pygame.mixer.music.load("assets/sound/didrikadventure2theme.mp3")
@@ -424,10 +474,11 @@ class Level1(Level_scene):
         pygame.mixer.music.queue("assets/sound/doneplaying.mp3")
 
     def update(self):
+
         self.common_update()
 
         if self.player.rect.colliderect(self.spike.hitbox):
-            die_sound()
+            pygame.mixer.Sound.play(damage)
             if self.lives == 1:
                 return Level1(self.lives)
             else:
@@ -437,9 +488,16 @@ class Level1(Level_scene):
             return Level2(self.lives)
         if self.player.rect.x > WIDTH:
             return Level2_5(self.lives)
+        if self.lives < 0:
+            return Loose_screen()
 
     def draw(self):
         SCREEN.blit(bg_img, (0, 0))
+
+        draw_text("Du har 5 minutter på å rekke timen", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
+
+        if self.player.rect.x <= START_POS[0]:
+            self.speech_bubble.draw()
 
         if self.player.rect.x < self.hidden_tile_x:
             for i in range(len(self.props)):
@@ -450,12 +508,18 @@ class Level1(Level_scene):
         return super().draw()
 
 
-def draw_text(text, font, color, surface, x, y):
+def draw_text(text, font, color, surface, x, y, timer = False):
     textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
-    textrect.center = (x, y)
+    if timer == True:
+        textrect.topleft = (x, y)
+    else:
+        textrect.center = (x, y)
+
     surface.blit(textobj, textrect)
     return textrect
+
+
 
 
 class Start_screen(Scene):
@@ -507,6 +571,7 @@ class Start_screen(Scene):
 
 
 class Loose_screen(Scene):
+
     restart_img = pygame.image.load("assets/img/restart.png").convert_alpha()
     restart_hover_img = pygame.image.load("assets/img/restart_hover.png").convert_alpha()
 
@@ -514,6 +579,7 @@ class Loose_screen(Scene):
     restart_hover_img = pygame.transform.scale(restart_hover_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
 
     restart_img_x = (WIDTH / 2 - BUTTON_WIDTH / 2)
+
 
     def __init__(self):
         # SCREEN.fill(START_COLOR)
@@ -540,17 +606,20 @@ class Loose_screen(Scene):
 
     def draw(self):
         SCREEN.blit(self.bg_img, (0, 0))
-        draw_text("Du tapte", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
+        draw_text("Du tapte!", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
+        draw_text("Du rakk ikke timen...", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 4)
+
 
         # Tegn restart-knappen basert på hover-tilstanden
         if self.restart_hover:
-            SCREEN.blit(self.restart_hover_img, (self.restart_img_x, BUTTON_y))
+            SCREEN.blit(self.restart_hover_img, (self.restart_img_x, BUTTON_y + TILE_SIZE))
         else:
-            SCREEN.blit(self.restart_img, (self.restart_img_x, BUTTON_y))
+            SCREEN.blit(self.restart_img, (self.restart_img_x, BUTTON_y + TILE_SIZE))
 
 
 game = Game(Start_screen())
 game.run()
 
 pygame.quit()
+
 
