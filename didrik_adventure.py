@@ -171,7 +171,7 @@ class Level_scene(Scene):
             self.timer[2] += 1
             self.timer[1] = 0
 
-        if self.timer[2] >= 1:
+        if self.timer[2] >= 5:
             self.lives = -1
 
 
@@ -183,7 +183,7 @@ class Level_scene(Scene):
 
 
 class Level5(Level_scene):
-    def __init__(self, lives):
+    def __init__(self, lives, timer):
         super().__init__(world_data_5, START_POS, lives, timer)
 
     def common_update(self):
@@ -209,7 +209,7 @@ class Level5(Level_scene):
 
 
 class Level4(Level_scene):
-    def __init__(self, lives):
+    def __init__(self, lives, timer):
         super().__init__(world_data_4, START_POS, lives, timer)
         self.cars = [Car(WIDTH // 2, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "car"),
                      Car(WIDTH // 2 + CAR_SPACING, HEIGHT - TILE_SIZE - 12 * CAR_SCALE, "cabriolet"),
@@ -230,6 +230,7 @@ class Level4(Level_scene):
         self.new_bubble_timer = 0
         self.bubble_count = 0
         self.pressed = False
+        self.timer = timer
 
     def update(self):
         self.common_update()
@@ -242,7 +243,7 @@ class Level4(Level_scene):
                 if self.player.rect.colliderect(hitbox):
                     pygame.mixer.Sound.play(damage)
                     if self.lives == 1:
-                        return Level4(self.lives)
+                        return Level4(self.lives, self.timer)
                     else:
                         return Loose_screen()
 
@@ -275,7 +276,7 @@ class Level4(Level_scene):
             if self.player.rect.colliderect(self.truck.rect):
                 pygame.mixer.Sound.play(damage)
                 if self.lives == 1:
-                    return Level4(self.lives)
+                    return Level4(self.lives, self.timer)
                 else:
                     return Loose_screen()
 
@@ -283,7 +284,7 @@ class Level4(Level_scene):
         self.truck.move()
 
         if self.player.rect.x > WIDTH:
-            return Level5(self.lives)
+            return Level5(self.lives, self.timer)
 
         if self.lives < 0:
             return Loose_screen()
@@ -303,10 +304,11 @@ class Level4(Level_scene):
 
 
 class Level3(Level_scene):
-    def __init__(self, lives):
+    def __init__(self, lives, timer):
         super().__init__(world_data_3, START_POS, lives, timer)
         self.spike = Spike(-1 * TILE_SIZE, 12 * TILE_SIZE)
         self.homing_spike = False
+        self.timer = timer
 
     def update(self):
         self.common_update()
@@ -329,12 +331,12 @@ class Level3(Level_scene):
         if self.player.rect.colliderect(self.spike.hitbox):
             pygame.mixer.Sound.play(damage)
             if self.lives == 1:
-                return Level3(self.lives)
+                return Level3(self.lives, self.timer)
             else:
                 return Loose_screen()
 
         if self.player.rect.x > WIDTH:
-            return Level4(self.lives)
+            return Level4(self.lives, self.timer)
 
         if self.lives < 0:
             return Loose_screen()
@@ -347,11 +349,12 @@ class Level3(Level_scene):
 
 
 class Level2_5(Level_scene):
-    def __init__(self, lives):
+    def __init__(self, lives, timer):
         super().__init__(world_data_2_5, START_POS, lives, timer)
         self.spikes = []
         for i in range(1, 8):
             self.spikes.append(Spike(3 * i * TILE_SIZE, 8 * TILE_SIZE))
+        self.timer = timer
 
     def update(self):
         self.common_update()
@@ -360,12 +363,12 @@ class Level2_5(Level_scene):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
                 pygame.mixer.Sound.play(damage)
                 if self.lives == 1:
-                    return Level2_5(self.lives)
+                    return Level2_5(self.lives, self.timer)
                 else:
                     return Loose_screen()
 
         if self.player.rect.y > HEIGHT:
-            return Level4(self.lives)
+            return Level4(self.lives, self.timer)
 
         if self.lives < 0:
             return Loose_screen()
@@ -379,7 +382,7 @@ class Level2_5(Level_scene):
 
 
 class Level2(Level_scene):
-    def __init__(self, lives):
+    def __init__(self, lives, timer):
         super().__init__(world_data_2, START_POS_2, lives, timer)
         self.portals = [Portal(280, 90), Portal(770, 90)]
         self.level_started = 0
@@ -390,6 +393,7 @@ class Level2(Level_scene):
             self.spikes.append(Spike((12 + i) * TILE_SIZE, 13 * TILE_SIZE))
         self.trap_timer = 0
         self.trap_activated = False
+        self.timer = timer
 
     def update(self):
         self.common_update()
@@ -425,7 +429,7 @@ class Level2(Level_scene):
             if self.player.rect.colliderect(self.spikes[i].hitbox):
                 pygame.mixer.Sound.play(damage)
                 if self.lives == 1:
-                    return Level2(self.lives)
+                    return Level2(self.lives, self.timer)
                 else:
                     return Loose_screen()
 
@@ -434,7 +438,7 @@ class Level2(Level_scene):
             self.player.rect.x = 800
 
         if self.player.rect.x > WIDTH:
-            return Level3(self.lives)
+            return Level3(self.lives, self.timer)
 
         self.trap_timer += 1
 
@@ -456,7 +460,7 @@ class Level2(Level_scene):
 
 
 class Level1(Level_scene):
-    def __init__(self, lives):
+    def __init__(self, lives, timer):
         super().__init__(world_data_1, START_POS, lives, timer)
         self.hidden_tile_x = 17 * TILE_SIZE
         self.props = []
@@ -468,11 +472,6 @@ class Level1(Level_scene):
 
         self.speech_bubble = Speech_bubble(START_POS[0] * 0.5, HEIGHT // 4, "Didrik", ["Jeg har forsovet meg!", "Har under 5 min på meg!!!"])
 
-        pygame.mixer.init()
-        pygame.mixer.music.load("assets/sound/didrikadventure2theme.mp3")
-        pygame.mixer.music.play(loops=10)
-        pygame.mixer.music.queue("assets/sound/doneplaying.mp3")
-
     def update(self):
 
         self.common_update()
@@ -480,14 +479,14 @@ class Level1(Level_scene):
         if self.player.rect.colliderect(self.spike.hitbox):
             pygame.mixer.Sound.play(damage)
             if self.lives == 1:
-                return Level1(self.lives)
+                return Level1(self.lives, timer)
             else:
                 return Loose_screen()
 
         if self.player.rect.y > HEIGHT:
-            return Level2(self.lives)
+            return Level2(self.lives, self.timer)
         if self.player.rect.x > WIDTH:
-            return Level2_5(self.lives)
+            return Level2_5(self.lives, self.timer)
         if self.lives < 0:
             return Loose_screen()
 
@@ -562,12 +561,12 @@ class Start_screen(Scene):
                 if self.last_chance_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(
                         mouse_pos):
                     # Start hovedspillet med 1 liv
-                    return Level1(0)
+                    return Level1(0, [0, 0, 0])
 
                 elif self.normal_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(
                         mouse_pos):
                     # Start hovedspillet med 5 liv
-                    return Level1(1)
+                    return Level1(1, [0, 0, 0])
 
 
 class Loose_screen(Scene):
@@ -619,6 +618,9 @@ class Loose_screen(Scene):
 
 game = Game(Start_screen())
 game.run()
+
+pygame.quit()
+
 
 pygame.quit()
 
