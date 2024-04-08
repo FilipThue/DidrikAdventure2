@@ -3,6 +3,7 @@ from settings import *
 from os.path import isfile, join
 from os import listdir
 
+
 def flip(sprites):
     return [pg.transform.flip(sprite, True, False) for sprite in sprites]
 
@@ -78,6 +79,7 @@ class Car:
     def draw(self):
         # pg.draw.rect(SCREEN, RED, self.hitbox[0])
         # pg.draw.rect(SCREEN, RED, self.hitbox[1])
+        # pg.draw.rect(SCREEN, RED, self.rect)
         SCREEN.blit(self.sprites[self.name + "_" + self.direction][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[self.name + "_" + self.direction])], self.rect)
 
 
@@ -219,6 +221,6 @@ class Player:
 
 
     def draw(self):
-        # pg.draw.rect(SCREEN, RED, self.rect)
+        # pg.draw.rect(SCREEN, (0, 0, 255), self.rect)
 
         SCREEN.blit(self.sprites[f"{self.current_animation}_{self.direction}"][(self.animation_count // ANIMATION_DELAY) % len(self.sprites[f"{self.current_animation}_{self.direction}"])], self.rect)
