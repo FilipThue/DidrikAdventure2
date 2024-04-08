@@ -29,24 +29,16 @@ class World:
         for row in data:
             col_count = 0
             for tile in row:
+                img = None
                 if tile == 1:
                     img = pygame.transform.scale(wall_img, (TILE_SIZE, TILE_SIZE))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * TILE_SIZE
-                    img_rect.y = row_count * TILE_SIZE
-                    self.tile_list.append((img, img_rect, "ground"))
-                if tile == 2:
+                elif tile == 2:
                     img = pygame.transform.scale(ground_img, (TILE_SIZE, TILE_SIZE))
+                if img:
                     img_rect = img.get_rect()
                     img_rect.x = col_count * TILE_SIZE
                     img_rect.y = row_count * TILE_SIZE
-                    self.tile_list.append((img, img_rect, "ground"))
-                if tile == 3:
-                    img = pygame.transform.scale(spike_img, (TILE_SIZE, TILE_SIZE))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * TILE_SIZE
-                    img_rect.y = row_count * TILE_SIZE
-                    self.tile_list.append((img, img_rect, "trap"))
+                    self.tile_list.append((img, img_rect))
 
                 col_count += 1
             row_count += 1
@@ -527,7 +519,7 @@ class Start_screen(Scene):
     last_chance_mode_hover_img = pygame.image.load("assets/img/last_chance_mode_hover.png").convert_alpha()
     normal_mode_hover_img = pygame.image.load("assets/img/normal_mode_hover.png").convert_alpha()
 
-    # Juster størrelsen på bildene
+    # Justerer størrelsen på bildene
     last_chance_mode_img = pygame.transform.scale(last_chance_mode_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
     normal_mode_img = pygame.transform.scale(normal_mode_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
     last_chance_mode_hover_img = pygame.transform.scale(last_chance_mode_hover_img, (BUTTON_WIDTH, BUTTON_HEIGHT))
@@ -541,14 +533,14 @@ class Start_screen(Scene):
         SCREEN.fill(START_COLOR)
         draw_text("Velg vanskelighetsgrad:", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 6)
 
-        # Tegn standardbilder
+        # Tegner standardbilder
         SCREEN.blit(self.normal_mode_img, (self.normal_mode_img_x, BUTTON_y))
         SCREEN.blit(self.last_chance_mode_img, (self.last_chance_mode_img_x, BUTTON_y))
 
-        # Hent museposisjonen
+        # Henter museposisjonen
         mouse_pos = pygame.mouse.get_pos()
 
-        # Sjekk for hover-effekt og tegn hover-bilder
+        # Sjekker for hover-effekt og tegn hover-bilder
         if self.normal_mode_img.get_rect(topleft=(self.normal_mode_img_x, BUTTON_y)).collidepoint(mouse_pos):
             SCREEN.blit(self.normal_mode_hover_img, (self.normal_mode_img_x, BUTTON_y))
         if self.last_chance_mode_img.get_rect(topleft=(self.last_chance_mode_img_x, BUTTON_y)).collidepoint(mouse_pos):
@@ -583,12 +575,12 @@ class Loose_screen(Scene):
     def __init__(self):
         # SCREEN.fill(START_COLOR)
         self.bg_img = pygame.image.load("assets/backdrops/you_loose.png")
-        self.restart_hover = False  # Legg til en tilstand for hover-effekten
+        self.restart_hover = False  # Legger til en tilstand for hover-effekten
 
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
 
-        # Sjekk om musen er over restart-knappen
+        # Sjekker om musen er over restart-knappen
         if self.restart_img.get_rect(topleft=(self.restart_img_x, BUTTON_y)).collidepoint(mouse_pos):
             self.restart_hover = True
         else:
@@ -598,7 +590,7 @@ class Loose_screen(Scene):
 
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Sjekk om musen klikket på restart-knappen
+                # Sjekker om musen klikket på restart-knappen
                 if self.restart_img.get_rect(topleft=(self.restart_img_x, BUTTON_y)).collidepoint(mouse_pos):
                     # Start hovedspillet med 1 liv
                     return Start_screen()
@@ -609,7 +601,7 @@ class Loose_screen(Scene):
         draw_text("Du rakk ikke timen...", font, WHITE, SCREEN, WIDTH // 2, HEIGHT // 4)
 
 
-        # Tegn restart-knappen basert på hover-tilstanden
+        # Tegner restart-knappen basert på hover-tilstanden
         if self.restart_hover:
             SCREEN.blit(self.restart_hover_img, (self.restart_img_x, BUTTON_y + TILE_SIZE))
         else:
@@ -621,7 +613,5 @@ game.run()
 
 pygame.quit()
 
-
-pygame.quit()
 
 
